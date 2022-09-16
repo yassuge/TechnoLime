@@ -8,6 +8,7 @@ contract TechnoLimeFactory is Ownable {
 
     TechnoLime[] private _technoLimes;
     mapping(string => bool) private _isLimeCreated;
+    mapping(string => address) private _technoIDs;
 
     // accessors
     function getTechnoLimes() public view returns (TechnoLime[] memory){
@@ -23,7 +24,9 @@ contract TechnoLimeFactory is Ownable {
         require(!_isLimeCreated[_id], "TechnoLime already exists");
 
         _isLimeCreated[_id] = true;
-        _technoLimes.push(new TechnoLime(_id, _desc));
+        TechnoLime newLime = new TechnoLime(_id, _desc);
+        _technoIDs[_id] = address(newLime);
+        _technoLimes.push(newLime);
         emit NewTechnoLimeLog(owner(), _id, _desc);
     }
 }
