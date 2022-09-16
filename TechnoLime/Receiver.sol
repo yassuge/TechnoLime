@@ -2,7 +2,7 @@
 pragma solidity ^0.8.7;
 import "./Ownable.sol";
 
-contract Receiver is Ownable{
+abstract contract Receiver {
     constructor() payable{}
     
     receive() external payable {}
