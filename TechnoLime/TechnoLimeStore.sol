@@ -3,8 +3,9 @@ pragma solidity ^0.8.7;
 import "./Ownable.sol";
 import "./Receiver.sol";
 import "./TechnoLime.sol";
+import "./Sender.sol";
 
-contract TechnoLimeStore is Ownable, Receiver {
+contract TechnoLimeStore is Ownable, Receiver, Sender {
 
     // Store Details
     mapping(string => uint) public inventory;
@@ -12,10 +13,10 @@ contract TechnoLimeStore is Ownable, Receiver {
     uint public constant RETURN_PERIOD = 100;
 
     // Clients details
-    mapping(address => bool) public isClient;
-    address[] public clients;
-    mapping(address => mapping(string => uint)) public ledger; // {client:{id:holding}}
-    mapping(address => TechnoLime[]) public clientsLimes; 
+    mapping(address => bool) private isClient;
+    address[] private clients;
+    mapping(address => mapping(string => uint)) private ledger; // {client:{id:holding}}
+    mapping(address => TechnoLime[]) private clientsLimes; 
     mapping(address => mapping(string => uint)) public transactionBlocks;
     mapping(address => mapping(string => uint)) public transactionPrices;
 
@@ -28,6 +29,11 @@ contract TechnoLimeStore is Ownable, Receiver {
 
     // Constructor
     constructor() payable {}
+
+    // Accessors
+    function getClients() public view returns (address[] memory){
+        return clients;
+    }
 
     // Store owner functions
     function addLime(TechnoLime lime, uint qty) external onlyOwner {
