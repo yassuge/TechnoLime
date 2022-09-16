@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.7;
 
-// inspired from https://github.com/OpenZeppelin/openzeppelin-test-helpers/blob/master/contracts/Ownable.sol
+// inspired from zeppelin-solidity/contracts/ownership/Ownable.sol
 
 abstract contract Ownable {
     address private _owner;
