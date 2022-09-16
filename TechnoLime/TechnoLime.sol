@@ -98,7 +98,7 @@ contract TechnoLimeStore is Ownable, Receiver {
         
         // Check client bought the product less than RETURN_PERIOD block ago
         if (transactionBlocks[_client][lime] != 0){
-            require(transactionBlocks[_client][lime] + RETURN_PERIOD > block.number, "Too late to return TechnoLime");
+            require(transactionBlocks[_client][lime] + RETURN_PERIOD > block.number, "Sorry! Too late to return TechnoLime");
         }
 
         // Pay back to client
