@@ -1,16 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.7;
 import "./Ownable.sol";
-
-contract TechnoLime {
-    string id;
-    string description;
-
-    constructor(string memory _id, string memory _desc) {
-        id = _id;
-        description = _desc;
-    }
-}
+import "./TechnoLime.sol";
 
 contract TechnoLimeFactory is Ownable {
     event NewTechnoLimeLog(address _creator, string _id, string _description);
