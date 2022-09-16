@@ -8,8 +8,8 @@ import "./Sender.sol";
 contract TechnoLimeStore is Ownable, Receiver, Sender {
 
     // Store Details
-    mapping(string => uint) public inventory;
-    mapping(string => uint) public prices;
+    mapping(string => uint) private inventory;
+    mapping(string => uint) private prices;
     uint public constant RETURN_PERIOD = 100;
 
     // Clients details
@@ -17,8 +17,8 @@ contract TechnoLimeStore is Ownable, Receiver, Sender {
     address[] private clients;
     mapping(address => mapping(string => uint)) private ledger; // {client:{id:holding}}
     mapping(address => TechnoLime[]) private clientsLimes; 
-    mapping(address => mapping(string => uint)) public transactionBlocks;
-    mapping(address => mapping(string => uint)) public transactionPrices;
+    mapping(address => mapping(string => uint)) private transactionBlocks;
+    mapping(address => mapping(string => uint)) private transactionPrices;
 
     // Events
     event PriceUpdateLog(address indexed _sender, address indexed _lime, uint _price);
@@ -34,12 +34,21 @@ contract TechnoLimeStore is Ownable, Receiver, Sender {
     function getClients() public view returns (address[] memory){
         return clients;
     }
+    
+    function getInventory(TechnoLime lime) public view returns (uint) {
+        return inventory[lime.id()];
+    }
+
+    function getPrice(TechnoLime lime) public view returns (uint) {
+        return prices[lime.id()];
+    }
 
     // Store owner functions
     function addLime(TechnoLime lime, uint qty) external onlyOwner {
         string memory _id = lime.id();
         require(prices[_id] > 0, "Please update price first!");
         inventory[_id] += qty;
+
         emit LimeAddedLog(msg.sender, address(lime), qty);
     }
 
