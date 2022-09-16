@@ -1,3 +1,4 @@
-/artifacts/
-/.history/
+*/artifacts/
+.history/
 .venv
+*/.DS_Store
