@@ -61,7 +61,7 @@ contract TechnoLimeStore is Ownable, Receiver {
                 revert("TechnoLime already bought by Client");
             }
         }
-        // TODO update inventory and check that enough in inventory
+        
         // Update transactionBlocks
         transactionBlocks[msg.sender][lime] = block.number;
 
@@ -76,6 +76,9 @@ contract TechnoLimeStore is Ownable, Receiver {
 
         // Update transactionPrices
         transactionPrices[msg.sender][lime] = prices[lime];
+
+        // Update inventory
+        inventory[lime] -= qty;
 
         // Log Event
         emit LimeBuyLog(msg.sender, lime, qty);
