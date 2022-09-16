@@ -29,4 +29,8 @@ contract TechnoLimeFactory is Ownable {
         _technoLimes.push(newLime);
         emit NewTechnoLimeLog(owner(), _id, _desc);
     }
+
+    function isLimeGenuine(TechnoLime lime) public view returns (bool){
+        return (address(lime) == _technoIDs[lime.id()]);
+    }
 }

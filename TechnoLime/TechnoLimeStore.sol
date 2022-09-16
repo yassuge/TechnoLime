@@ -4,8 +4,10 @@ import "./Ownable.sol";
 import "./Receiver.sol";
 import "./TechnoLime.sol";
 import "./Sender.sol";
+import "./TechnoLimeFactory.sol";
+import "./TechnoLimeFactoryDealer.sol";
 
-contract TechnoLimeStore is Ownable, Receiver, Sender {
+contract TechnoLimeStore is Ownable, Receiver, Sender, TechnoLimeFactoryDealer {
 
     // Store Details
     mapping(string => uint) private inventory;
@@ -28,23 +30,23 @@ contract TechnoLimeStore is Ownable, Receiver, Sender {
     event LimeReturnLog(address indexed _sender, address indexed _lime, uint _qty);
 
     // Constructor
-    constructor() payable {}
+    constructor(TechnoLimeFactory limeFactory) payable TechnoLimeFactoryDealer(limeFactory){}
 
     // Accessors
     function getClients() public view returns (address[] memory){
         return clients;
     }
     
-    function getInventory(TechnoLime lime) public view returns (uint) {
+    function getInventory(TechnoLime lime) public view OnlyFactoryTechnoLime(lime) returns (uint) {
         return inventory[lime.id()];
     }
 
-    function getPrice(TechnoLime lime) public view returns (uint) {
+    function getPrice(TechnoLime lime) public view OnlyFactoryTechnoLime(lime) returns (uint) {
         return prices[lime.id()];
     }
 
     // Store owner functions
-    function addLime(TechnoLime lime, uint qty) external onlyOwner {
+    function addLime(TechnoLime lime, uint qty) external onlyOwner OnlyFactoryTechnoLime(lime) {
         string memory _id = lime.id();
         require(prices[_id] > 0, "Please update price first!");
         inventory[_id] += qty;
@@ -52,7 +54,7 @@ contract TechnoLimeStore is Ownable, Receiver, Sender {
         emit LimeAddedLog(msg.sender, address(lime), qty);
     }
 
-    function removeLime(TechnoLime lime, uint qty) external onlyOwner {
+    function removeLime(TechnoLime lime, uint qty) external onlyOwner OnlyFactoryTechnoLime(lime){
         string memory _id = lime.id();
 
         require(inventory[_id] >= qty, "not enough inventory");
@@ -60,7 +62,7 @@ contract TechnoLimeStore is Ownable, Receiver, Sender {
         emit LimeRemovedLog(msg.sender, address(lime), qty);
     }
 
-    function updatePrice(TechnoLime lime, uint price) external onlyOwner {
+    function updatePrice(TechnoLime lime, uint price) external onlyOwner OnlyFactoryTechnoLime(lime){
         string memory _id = lime.id();
 
         prices[_id] = price;
@@ -68,7 +70,7 @@ contract TechnoLimeStore is Ownable, Receiver, Sender {
     }
 
     // Clients functions
-    function buyLime(TechnoLime lime, uint qty) external payable {
+    function buyLime(TechnoLime lime, uint qty) external payable OnlyFactoryTechnoLime(lime){
         // check qty > 0
         require(qty>0, "quantity to buy needs to be strictly higher than 0");
 
@@ -113,7 +115,7 @@ contract TechnoLimeStore is Ownable, Receiver, Sender {
         emit LimeBuyLog(msg.sender, address(lime), qty);
     }
 
-    function returnLime(TechnoLime lime) external {
+    function returnLime(TechnoLime lime) external OnlyFactoryTechnoLime(lime){
         address _client = msg.sender;
         string memory _id = lime.id();
         uint _holding = ledger[_client][_id];
