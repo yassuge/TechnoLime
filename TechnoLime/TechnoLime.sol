@@ -48,6 +48,9 @@ contract TechnoLimeStore is Ownable, Receiver {
 
     // Clients functions
     function buyLime(TechnoLime lime, uint qty) external payable {
+        // check enough inventory
+        require(qty<inventory[lime], "not enough inventory in store");
+
         // Check enough ETH is sent
         require(msg.value > prices[lime] * qty, "not enough ETH is sent");
 
@@ -58,7 +61,7 @@ contract TechnoLimeStore is Ownable, Receiver {
                 revert("TechnoLime already bought by Client");
             }
         }
-
+        // TODO update inventory and check that enough in inventory
         // Update transactionBlocks
         transactionBlocks[msg.sender][lime] = block.number;
 
@@ -86,7 +89,7 @@ contract TechnoLimeStore is Ownable, Receiver {
         if (transactionBlocks[_client][lime] != 0){
             require(transactionBlocks[_client][lime] + RETURN_PERIOD > block.number, "Too late to return TechnoLime");
         }
-
+        // TODO update inventory
         // Pay back to client
         uint _amount = _holding * transactionPrices[_client][lime];
         (bool sent, ) = payable(_client).call{value: _amount}("");
