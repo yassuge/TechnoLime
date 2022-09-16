@@ -12,6 +12,7 @@ contract TechnoLimeStore is Ownable, Receiver {
     uint public constant RETURN_PERIOD = 100;
 
     // Clients details
+    mapping(address => bool) public isClient;
     address[] public clients;
     mapping(address => mapping(TechnoLime => uint)) public ledger; // {Client:{TechnoLime:Holding}}
     mapping(address => TechnoLime[]) public clientsLimes; 
@@ -48,6 +49,9 @@ contract TechnoLimeStore is Ownable, Receiver {
 
     // Clients functions
     function buyLime(TechnoLime lime, uint qty) external payable {
+        // check qty > 0
+        require(qty>0, "quantity to buy needs to be strictly higher than 0");
+
         // check enough inventory
         require(qty<inventory[lime], "not enough inventory in store");
 
@@ -71,8 +75,11 @@ contract TechnoLimeStore is Ownable, Receiver {
         // Update clientsLimes
         clientsLimes[msg.sender].push(lime);
 
-        // Update clients
-        clients.push(msg.sender);
+        // Update clients list
+        if(!isClient[msg.sender]){
+            isClient[msg.sender] = true;
+            clients.push(msg.sender);
+        }
 
         // Update transactionPrices
         transactionPrices[msg.sender][lime] = prices[lime];
@@ -88,17 +95,21 @@ contract TechnoLimeStore is Ownable, Receiver {
         address _client = msg.sender;
         uint _holding = ledger[_client][lime];
         require (_holding>0, "No holding to return to store");
+        
         // Check client bought the product less than RETURN_PERIOD block ago
         if (transactionBlocks[_client][lime] != 0){
             require(transactionBlocks[_client][lime] + RETURN_PERIOD > block.number, "Too late to return TechnoLime");
         }
-        // TODO update inventory
+
         // Pay back to client
         uint _amount = _holding * transactionPrices[_client][lime];
         (bool sent, ) = payable(_client).call{value: _amount}("");
         require(sent, "Failed to send Ether");
 
-        // Reset client holdings
+        // Update inventory
+        inventory[lime] += _holding;
+
+        // Reset client records => as if no transaction took place
         ledger[_client][lime] = 0;
         transactionPrices[_client][lime] = 0;
         transactionBlocks[_client][lime] = 0;
